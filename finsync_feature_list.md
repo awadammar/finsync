@@ -1,4 +1,4 @@
-#FinSync Feature List
+# FinSync Feature List
 
 - FinSync should monitor a usere's bank messages and serialize it to an expense entry.
 - FinSync should allow users to categorize their expenses (e.g. groceries, transportation, entertainment).
