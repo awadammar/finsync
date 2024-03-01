@@ -9,10 +9,12 @@ import lombok.Setter;
 @Entity
 @Table(name = "settings")
 public class Settings {
-
     @Id
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    private Long id;
+
+    @MapsId
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
     private User user;
 
     // Example:
