@@ -1,5 +1,7 @@
-package com.project.finsync.domain.model.entity;
+package com.project.finsync.model;
 
+import com.project.finsync.enums.ReminderStatus;
+import com.project.finsync.enums.ReminderType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

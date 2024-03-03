@@ -1,6 +1,6 @@
-package com.project.finsync.domain.model.repository;
+package com.project.finsync.repository;
 
-import com.project.finsync.domain.model.entity.User;
+import com.project.finsync.model.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

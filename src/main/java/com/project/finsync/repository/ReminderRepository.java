@@ -1,6 +1,6 @@
-package com.project.finsync.domain.model.repository;
+package com.project.finsync.repository;
 
-import com.project.finsync.domain.model.entity.Reminder;
+import com.project.finsync.model.Reminder;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ReminderRepository extends CrudRepository<Reminder, Long> {

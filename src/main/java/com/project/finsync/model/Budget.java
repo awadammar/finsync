@@ -1,5 +1,6 @@
-package com.project.finsync.domain.model.entity;
+package com.project.finsync.model;
 
+import com.project.finsync.enums.BudgetCategory;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

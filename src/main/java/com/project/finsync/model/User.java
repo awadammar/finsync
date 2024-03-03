@@ -1,4 +1,4 @@
-package com.project.finsync.domain.model.entity;
+package com.project.finsync.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +17,9 @@ public class User {
     private String username;
     private String email;
     private String password; // Note: In production, use proper encryption/hashing
-    public User(String username) {
+    public User(String username, String email, String password) {
         this.username = username;
+        this.email = email;
+        this.password = password;
     }
 }

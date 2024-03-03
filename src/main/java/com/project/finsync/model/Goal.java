@@ -1,4 +1,4 @@
-package com.project.finsync.domain.model.entity;
+package com.project.finsync.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

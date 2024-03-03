@@ -1,4 +1,4 @@
-package com.project.finsync.domain.model.entity;
+package com.project.finsync.enums;
 
 public enum ReminderStatus {
     PENDING,
