@@ -10,6 +10,7 @@ import lombok.Setter;
 @Table(name = "accounts")
 @Entity
 public class Account {
+    private static final String ACCOUNT_DEFAULT_NAME = "Default Account";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +24,10 @@ public class Account {
     private AccountType accountType;
     private String accountName;
     private String currency;
+
+    public Account(Long userId) {
+        this.userId = userId;
+        this.accountType = AccountType.PERSONAL;
+        this.accountName = ACCOUNT_DEFAULT_NAME;
+    }
 }

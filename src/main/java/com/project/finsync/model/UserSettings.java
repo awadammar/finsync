@@ -10,14 +10,16 @@ import lombok.Setter;
 @Table(name = "settings")
 public class UserSettings {
     @Id
-    private Long id;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private Long userId;
 
-    @MapsId
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    private User user;
+    private Boolean pushNotification;
+    private Boolean deleteAccount;
 
-    // Example:
-    // currencyPreference;
-    // notificationEnabled;
+    public UserSettings(Long userId) {
+        this.userId = userId;
+        pushNotification = true;
+        deleteAccount = false;
+    }
 }

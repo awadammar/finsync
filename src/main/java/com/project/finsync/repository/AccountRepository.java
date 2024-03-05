@@ -11,7 +11,10 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
 
     Optional<Account> findByIdAndUserId(Long id, Long userId);
 
-    Account createAccount(Account account);
+    void createAccountByUserId(Long userId);
+
+    Optional<Account> updateAccountByUserId(Long userId, Account newAccount);
+
     void deleteAllUserAccounts(Long userId);
 
     void deleteByIdAndUserId(Long id, Long userId);

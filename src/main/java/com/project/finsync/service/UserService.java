@@ -1,7 +1,5 @@
 package com.project.finsync.service;
 
-import com.project.finsync.enums.AccountType;
-import com.project.finsync.model.Account;
 import com.project.finsync.model.User;
 import com.project.finsync.repository.*;
 import jakarta.transaction.Transactional;
@@ -10,13 +8,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.project.finsync.util.UserUtils.ACCOUNT_DEFAULT_NAME;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final BudgetRepository budgetRepository;
+    private final GoalRepository goalRepository;
+    private final ReminderRepository reminderRepository;
+    private final TransactionRepository transactionRepository;
+    private final UserSettingsRepository userSettingsRepository;
+
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -27,13 +29,8 @@ public class UserService {
 
     public User createUser(User user) {
         User newUser = userRepository.save(user);
-
-        // Create an account for the new user
-        Account account = new Account();
-        account.setUserId(newUser.getId());
-        account.setAccountType(AccountType.PERSONAL);
-        account.setAccountName(ACCOUNT_DEFAULT_NAME);
-        accountRepository.createAccount(account);
+        accountRepository.createAccountByUserId(user.getId());
+        userSettingsRepository.createSettingsByUserId(user.getId());
         return newUser;
     }
 
@@ -57,6 +54,11 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
             accountRepository.deleteAllUserAccounts(id);
+//            budgetRepository.deleteByUserId(id);
+//            goalRepository.deleteByUserId(id);
+//            reminderRepository.deleteByUserId(id);
+//            transactionRepository.deleteByUserId(id);
+            userSettingsRepository.deleteByUserId(id);
             userRepository.delete(user);
         });
     }

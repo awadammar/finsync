@@ -2,11 +2,10 @@ package com.project.finsync.service;
 
 import com.project.finsync.model.Account;
 import com.project.finsync.repository.AccountRepository;
-import com.project.finsync.util.UserUtils;
-import com.project.finsync.util.exceptions.UnauthorizedAccessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,12 +21,12 @@ public class AccountService {
         return accountRepository.findByIdAndUserId(id, userId);
     }
 
-    public Account createAccount(Account account) {
-        account.setUserId(account.getUserId());
+    public Account createAccountByUserId(Long userId) {
+        Account account = new Account(userId);
         return accountRepository.save(account);
     }
 
-    public Optional<Account> updateAccount(Long id, Account newAccount) {
+    public Optional<Account> updateAccountByUserId(Long id, Account newAccount) {
         return accountRepository.findById(id).map(account -> {
             if (newAccount.getAccountName() != null) {
                 account.setAccountName(newAccount.getAccountName());
@@ -43,20 +42,16 @@ public class AccountService {
     }
 
     public void deleteAllUserAccounts(Long userId) {
-        for (Account account : accountRepository.findByUserId(userId)) {
-            if(UserUtils.belongsToUser(account, userId)) {
-                accountRepository.deleteById(account.getId());
-            }
-        }
+        List<Long> accountIds = accountRepository.findByUserId(userId)
+                .stream()
+                .map(Account::getId)
+                .toList();
+        accountRepository.deleteAllById(accountIds);
     }
 
     public void deleteByIdAndUserId(Long id, Long userId) {
-        findByIdAndUserId(id, userId).ifPresent(account -> {
-            if (UserUtils.belongsToUser(account, userId)) {
-                accountRepository.deleteById(account.getId());
-            } else {
-                throw new UnauthorizedAccessException("User is not authorized to delete this account");
-            }
-        });
+        findByIdAndUserId(id, userId).ifPresent(account ->
+                accountRepository.deleteById(account.getId())
+        );
     }
 }
