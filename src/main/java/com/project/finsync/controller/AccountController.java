@@ -28,25 +28,28 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<Account> createAccountByUserId(@PathVariable Long userId, @Validated @RequestBody Account account) {
-        Account createdAccount = accountService.createAccountByUserId(userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
+    public ResponseEntity<Account> createAccount(@PathVariable Long userId, @Validated @RequestBody Account account) {
+        return accountService.createAccount(userId, account)
+                .map(createdAccount -> ResponseEntity.status(HttpStatus.CREATED).body(createdAccount))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Account> updateAccountByUserId(@PathVariable Long id, @Validated @RequestBody Account newAccount) {
-        Optional<Account> updatedAccount = accountService.updateAccountByUserId(id, newAccount);
+    ResponseEntity<Account> updateAccount(@PathVariable Long id, @Validated @RequestBody Account newAccount) {
+        Optional<Account> updatedAccount = accountService.updateAccount(id, newAccount);
         return updatedAccount.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping
-    public void deleteAllUserAccounts(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteAllUserAccounts(@PathVariable Long userId) {
         accountService.deleteAllUserAccounts(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteByIdAndUserId(@PathVariable Long id, @PathVariable Long userId) {
+    public ResponseEntity<Void> deleteByIdAndUserId(@PathVariable Long id, @PathVariable Long userId) {
         accountService.deleteByIdAndUserId(id, userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

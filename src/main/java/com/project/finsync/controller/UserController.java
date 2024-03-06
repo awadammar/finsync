@@ -18,13 +18,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Iterable<User> getAllUsers() {
-        return userService.getAllUsers();
+    public Iterable<User> findAllUsers() {
+        return userService.findAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        Optional<User> user = userService.getUserById(id);
+    public ResponseEntity<User> findUserById(@PathVariable Long id) {
+        Optional<User> user = userService.findUserById(id);
         return user.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -42,7 +42,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    void deleteUser(@PathVariable Long id) {
+    ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -16,26 +16,21 @@ public class UserSettingsService {
         return userSettingsRepository.findByUserId(userId);
     }
 
-    public UserSettings createSettingsByUserId(Long userId) {
-        UserSettings userSettings = new UserSettings(userId);
-        return userSettingsRepository.save(userSettings);
-    }
-
-    public Optional<UserSettings> updateSettingsByUserId(Long id, UserSettings newUserSettings) {
-        return userSettingsRepository.findById(id).map(account -> {
-            if (newUserSettings.getPushNotification() != null) {
-                account.setPushNotification(newUserSettings.getPushNotification());
+    public Optional<UserSettings> updateUserSettings(Long userId, UserSettings updatedUserSettings) {
+        return userSettingsRepository.findByUserId(userId).map(userSettings -> {
+            if (updatedUserSettings.getPushNotification() != null) {
+                userSettings.setPushNotification(updatedUserSettings.getPushNotification());
             }
-            if (newUserSettings.getDeleteAccount() != null) {
-                account.setDeleteAccount(newUserSettings.getDeleteAccount());
+            if (updatedUserSettings.getDeleteAccount() != null) {
+                userSettings.setDeleteAccount(updatedUserSettings.getDeleteAccount());
             }
-            return userSettingsRepository.save(account);
+            return userSettingsRepository.save(userSettings);
         });
     }
 
     public void deleteByUserId(Long userId) {
         findByUserId(userId).ifPresent(userSetting ->
-                userSettingsRepository.deleteById(userSetting.getUserId())
+                userSettingsRepository.deleteByUserId(userSetting.getUser().getId())
         );
     }
 

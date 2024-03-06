@@ -2,6 +2,7 @@ package com.project.finsync.service;
 
 import com.project.finsync.model.Account;
 import com.project.finsync.repository.AccountRepository;
+import com.project.finsync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccountService {
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
 
     public Iterable<Account> findByUserId(Long userId) {
         return accountRepository.findByUserId(userId);
@@ -21,21 +23,24 @@ public class AccountService {
         return accountRepository.findByIdAndUserId(id, userId);
     }
 
-    public Account createAccountByUserId(Long userId) {
-        Account account = new Account(userId);
-        return accountRepository.save(account);
+    public Optional<Account> createAccount(Long userId, Account account) {
+        return userRepository.findById(userId).map(user -> {
+            Account cratedAccount = accountRepository.save(account);
+            cratedAccount.setUser(user);
+            return accountRepository.save(cratedAccount);
+        });
     }
 
-    public Optional<Account> updateAccountByUserId(Long id, Account newAccount) {
+    public Optional<Account> updateAccount(Long id, Account updateAccount) {
         return accountRepository.findById(id).map(account -> {
-            if (newAccount.getAccountName() != null) {
-                account.setAccountName(newAccount.getAccountName());
+            if (updateAccount.getName() != null) {
+                account.setName(updateAccount.getName());
             }
-            if (newAccount.getAccountType() != null) {
-                account.setAccountType(newAccount.getAccountType());
+            if (updateAccount.getType() != null) {
+                account.setType(updateAccount.getType());
             }
-            if (newAccount.getCurrency() != null) {
-                account.setCurrency(newAccount.getCurrency());
+            if (updateAccount.getCurrency() != null) {
+                account.setCurrency(updateAccount.getCurrency());
             }
             return accountRepository.save(account);
         });

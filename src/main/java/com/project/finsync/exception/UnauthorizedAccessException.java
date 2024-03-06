@@ -1,4 +1,4 @@
-package com.project.finsync.util.exceptions;
+package com.project.finsync.exception;
 
 public class UnauthorizedAccessException extends RuntimeException {
 

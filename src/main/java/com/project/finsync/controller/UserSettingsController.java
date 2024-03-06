@@ -23,21 +23,16 @@ public class UserSettingsController {
         return settings.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<UserSettings> createSettingsByUserId(@PathVariable Long userId, @Validated @RequestBody UserSettings userSettings) {
-        UserSettings createdUserSettings = userSettingsService.createSettingsByUserId(userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUserSettings);
-    }
-
-    @PutMapping("/{id}")
-    ResponseEntity<UserSettings> updateSettingsByUserId(@PathVariable Long id, @Validated @RequestBody UserSettings newUserSettings) {
-        Optional<UserSettings> updatedUser = userSettingsService.updateSettingsByUserId(id, newUserSettings);
-        return updatedUser.map(ResponseEntity::ok)
+    @PutMapping
+    ResponseEntity<UserSettings> updateSettings(@PathVariable Long userId, @Validated @RequestBody UserSettings newUserSettings) {
+        Optional<UserSettings> updatedUserSettings = userSettingsService.updateUserSettings(userId, newUserSettings);
+        return updatedUserSettings.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping
-    public void deleteUserSettings(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteByUserId(@PathVariable Long userId) {
         userSettingsService.deleteByUserId(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

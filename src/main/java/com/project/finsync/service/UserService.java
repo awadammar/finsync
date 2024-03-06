@@ -1,7 +1,10 @@
 package com.project.finsync.service;
 
+import com.project.finsync.model.Account;
 import com.project.finsync.model.User;
-import com.project.finsync.repository.*;
+import com.project.finsync.model.UserSettings;
+import com.project.finsync.repository.UserRepository;
+import com.project.finsync.repository.UserSettingsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,39 +15,42 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final AccountRepository accountRepository;
-    private final BudgetRepository budgetRepository;
-    private final GoalRepository goalRepository;
-    private final ReminderRepository reminderRepository;
-    private final TransactionRepository transactionRepository;
+    private final AccountService accountService;
     private final UserSettingsRepository userSettingsRepository;
 
-    public Iterable<User> getAllUsers() {
+    public Iterable<User> findAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> findUserById(Long id) {
         return userRepository.findById(id);
     }
 
+    @Transactional
     public User createUser(User user) {
-        User newUser = userRepository.save(user);
-        accountRepository.createAccountByUserId(user.getId());
-        userSettingsRepository.createSettingsByUserId(user.getId());
-        return newUser;
+        User savedUser = userRepository.save(user);
+        savedUser.setUsername(user.getUsername());
+        savedUser.setPassword(user.getPassword());
+
+        UserSettings userSettings = new UserSettings(user);
+        userSettingsRepository.save(userSettings);
+
+        Account account = new Account(user);
+        accountService.createAccount(user.getId(), account);
+
+        return savedUser;
     }
 
-    public Optional<User> updateUser(Long id, User newUser) {
+    public Optional<User> updateUser(Long id, User updatedUser) {
         return userRepository.findById(id).map(user -> {
-            user.setUsername(newUser.getUsername());
-            if (newUser.getEmail() != null) {
-                user.setEmail(newUser.getEmail());
+            if (updatedUser.getUsername() != null) {
+                user.setUsername(updatedUser.getUsername());
             }
-            if (newUser.getUsername() != null) {
-                user.setUsername(newUser.getUsername());
+            if (updatedUser.getEmail() != null) {
+                throw new UnsupportedOperationException("Cannot update email field");
             }
-            if (newUser.getPassword() != null) {
-                user.setPassword(newUser.getPassword());
+            if (updatedUser.getPassword() != null) {
+                user.setPassword(updatedUser.getPassword());
             }
             return userRepository.save(user);
         });
@@ -53,12 +59,8 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
-            accountRepository.deleteAllUserAccounts(id);
-//            budgetRepository.deleteByUserId(id);
-//            goalRepository.deleteByUserId(id);
-//            reminderRepository.deleteByUserId(id);
-//            transactionRepository.deleteByUserId(id);
-            userSettingsRepository.deleteByUserId(id);
+            accountService.deleteAllUserAccounts(user.getId());
+            userSettingsRepository.deleteByUserId(user.getId());
             userRepository.delete(user);
         });
     }
