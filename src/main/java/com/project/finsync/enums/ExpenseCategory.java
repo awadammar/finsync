@@ -1,6 +1,6 @@
 package com.project.finsync.enums;
 
-public enum BudgetCategory {
+public enum ExpenseCategory {
     BILL,
     DINING,
     EMI,

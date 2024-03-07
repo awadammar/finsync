@@ -3,5 +3,9 @@ package com.project.finsync.enums;
 public enum TransactionType {
     INCOME,
     EXPENSE,
-    TRANSFER
+    TRANSFER,
+    ATM_WITHDRAWAL,
+    CASH_RECEIVED,
+    CASHBACK,
+    REFUND
 }
