@@ -18,35 +18,35 @@ import java.util.Set;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
 
-    public Iterable<Transaction> getAllTransactions() {
+    public Iterable<Transaction> findAllTransactions() {
         return transactionRepository.findAll();
     }
 
-    public Transaction getTransactionById(Long transactionId) {
+    public Transaction findTransactionById(Long transactionId) {
         return transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + transactionId));
     }
 
-    public List<Transaction> getTransactionsByAccount(Account account) {
+    public List<Transaction> findTransactionsByAccount(Account account) {
         return transactionRepository.findByAccount(account);
     }
 
-    public List<Transaction> getTransactionsByAccountByMonth(Account account, Month month) {
+    public List<Transaction> findTransactionsByAccountByMonth(Account account, Month month) {
         return transactionRepository.findByAccount(account)
                 .stream()
                 .filter(transaction -> month.equals(transaction.getDate().getMonth()))
                 .toList();
     }
 
-    public List<Transaction> getTransactionsByAccountByType(Account account, TransactionType transactionType) {
+    public List<Transaction> findTransactionsByAccountByType(Account account, TransactionType transactionType) {
         return transactionRepository.findByAccountAndType(account, transactionType);
     }
 
-    public List<Transaction> getTransactionsByAccountByCategory(Account account, ExpenseCategory expenseCategory) {
+    public List<Transaction> findTransactionsByAccountByCategory(Account account, ExpenseCategory expenseCategory) {
         return transactionRepository.findByAccountAndCategory(account, expenseCategory);
     }
 
-    public List<Transaction> getTransactionsByAccountByCategory(Account account, Set<String> tags) {
+    public List<Transaction> findTransactionsByAccountByTags(Account account, Set<String> tags) {
         return transactionRepository.findByAccountAndTagsIn(account, tags);
     }
 

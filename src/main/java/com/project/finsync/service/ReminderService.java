@@ -18,20 +18,20 @@ public class ReminderService {
     private final ReminderRepository reminderRepository;
     private final UserRepository userRepository;
 
-    public Iterable<Reminder> getAllReminders() {
+    public Iterable<Reminder> findAllReminders() {
         return reminderRepository.findAll();
     }
 
-    public Reminder getReminderById(Long reminderId) {
+    public Reminder findReminderById(Long reminderId) {
         return reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new EntityNotFoundException("Reminder not found with id: " + reminderId));
     }
 
-    public List<Reminder> getRemindersByUser(User user) {
+    public List<Reminder> findRemindersByUser(User user) {
         return reminderRepository.findByUser(user);
     }
 
-    public List<Reminder> getRemindersByUserByStatus(User user, ReminderStatus status) {
+    public List<Reminder> findRemindersByUserByStatus(User user, ReminderStatus status) {
         return reminderRepository.findByUser(user)
                 .stream()
                 .filter(reminder -> reminder.getStatus().equals(status))
@@ -43,7 +43,7 @@ public class ReminderService {
                 .ifPresent(reminder -> reminder.setStatus(ReminderStatus.COMPLETED));
     }
 
-    public List<Reminder> getRemindersByUserByDate(User user, LocalDate date) {
+    public List<Reminder> findRemindersByUserByDate(User user, LocalDate date) {
         return reminderRepository.findByUser(user)
                 .stream()
                 .filter(reminder -> reminder.getDate().isEqual(date))

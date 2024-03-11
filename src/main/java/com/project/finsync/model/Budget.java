@@ -28,4 +28,5 @@ public class Budget {
     private Month month;
     @Enumerated(EnumType.STRING)
     private ExpenseCategory category;
+
 }
