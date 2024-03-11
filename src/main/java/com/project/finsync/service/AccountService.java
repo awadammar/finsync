@@ -25,9 +25,8 @@ public class AccountService {
 
     public Optional<Account> createAccount(Long userId, Account account) {
         return userRepository.findById(userId).map(user -> {
-            Account cratedAccount = accountRepository.save(account);
-            cratedAccount.setUser(user);
-            return accountRepository.save(cratedAccount);
+            account.setUser(user);
+            return accountRepository.save(account);
         });
     }
 

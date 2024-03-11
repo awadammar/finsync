@@ -8,9 +8,11 @@ import com.project.finsync.repository.TransactionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -55,5 +57,46 @@ public class TransactionService {
                 .stream()
                 .mapToDouble(Transaction::getAmount)
                 .sum();
+    }
+
+    public Transaction createTransaction(Account account, Transaction transaction) {
+        transaction.setAccount(account);
+        return transactionRepository.save(transaction);
+    }
+
+    public Optional<Transaction> updateTransaction(Long transactionId, Transaction updateTransaction) {
+        return transactionRepository.findById(transactionId).map(budget -> {
+            if (updateTransaction.getAmount() != null) {
+                budget.setAmount(updateTransaction.getAmount());
+            }
+            if (updateTransaction.getAccount() != null) {
+                budget.setAccount(updateTransaction.getAccount());
+            }
+            if (updateTransaction.getDate() != null) {
+                budget.setDate(updateTransaction.getDate());
+            }
+            if (updateTransaction.getDescription() != null) {
+                budget.setDescription(updateTransaction.getDescription());
+            }
+            if (updateTransaction.getCategory() != null) {
+                budget.setCategory(updateTransaction.getCategory());
+            }
+            if (updateTransaction.getLocation() != null) {
+                budget.setLocation(updateTransaction.getLocation());
+            }
+            if (!CollectionUtils.isEmpty(updateTransaction.getTags())) {
+                budget.getTags().addAll(updateTransaction.getTags());
+            }
+            return transactionRepository.save(budget);
+        });
+    }
+
+    public void deleteAccountTransactions(Account account) {
+        transactionRepository.findByAccount(account)
+                .forEach(reminder -> deleteTransaction(reminder.getTransactionId()));
+    }
+
+    public void deleteTransaction(Long budgetId) {
+        transactionRepository.deleteById(budgetId);
     }
 }

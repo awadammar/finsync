@@ -29,7 +29,6 @@ public class UserService {
     @Transactional
     public User createUser(User user) {
         User savedUser = userRepository.save(user);
-        savedUser.setUsername(user.getUsername());
         savedUser.setPassword(user.getPassword());
 
         UserSettings userSettings = new UserSettings(user);
@@ -43,9 +42,6 @@ public class UserService {
 
     public Optional<User> updateUser(Long id, User updatedUser) {
         return userRepository.findById(id).map(user -> {
-            if (updatedUser.getUsername() != null) {
-                user.setUsername(updatedUser.getUsername());
-            }
             if (updatedUser.getEmail() != null) {
                 throw new UnsupportedOperationException("Cannot update email field");
             }

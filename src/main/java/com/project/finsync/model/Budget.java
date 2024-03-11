@@ -23,7 +23,6 @@ public class Budget {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String name;
     private Double amount;
     private Month month;
     @Enumerated(EnumType.STRING)

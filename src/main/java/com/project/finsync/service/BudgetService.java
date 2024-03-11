@@ -4,19 +4,18 @@ import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.model.Budget;
 import com.project.finsync.model.User;
 import com.project.finsync.repository.BudgetRepository;
-import com.project.finsync.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BudgetService {
     private final BudgetRepository budgetRepository;
-    private final UserRepository userRepository;
 
     public Iterable<Budget> findAllBudgets() {
         return budgetRepository.findAll();
@@ -44,6 +43,24 @@ public class BudgetService {
                 .stream()
                 .mapToDouble(Budget::getAmount)
                 .sum();
+    }
+
+    public Budget createBudget(User user, Budget budget) {
+        budget.setUser(user);
+        return budgetRepository.save(budget);
+    }
+
+    public Optional<Budget> updateBudget(Long budgetId, Budget updateBudget) {
+        return budgetRepository.findById(budgetId).map(budget -> {
+            if (updateBudget.getAmount() != null) {
+                budget.setAmount(updateBudget.getAmount());
+            }
+            return budgetRepository.save(budget);
+        });
+    }
+
+    public void deleteBudget(Long budgetId) {
+        budgetRepository.deleteById(budgetId);
     }
 
 }
