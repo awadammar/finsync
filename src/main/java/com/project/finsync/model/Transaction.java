@@ -6,8 +6,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.geo.Point;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -30,4 +32,6 @@ public class Transaction {
     private LocalDate date;
     private String description;
     private ExpenseCategory category;
+    private Set<String> tags;
+    private Point location;
 }

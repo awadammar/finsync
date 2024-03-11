@@ -37,6 +37,5 @@ public class Account {
         this.user = user;
         this.name = name;
         this.type = type;
-
     }
 }

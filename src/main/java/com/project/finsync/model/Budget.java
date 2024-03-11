@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.Month;
 
 @Getter
 @Setter
@@ -19,10 +19,13 @@ public class Budget {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long budgetId;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String name;
     private Double amount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Month month;
     @Enumerated(EnumType.STRING)
     private ExpenseCategory category;
 }

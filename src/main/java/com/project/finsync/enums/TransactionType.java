@@ -7,5 +7,6 @@ public enum TransactionType {
     ATM_WITHDRAWAL,
     CASH_RECEIVED,
     CASHBACK,
-    REFUND
+    REFUND,
+    OTHER
 }
