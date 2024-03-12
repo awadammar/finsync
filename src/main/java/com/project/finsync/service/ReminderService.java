@@ -2,13 +2,14 @@ package com.project.finsync.service;
 
 import com.project.finsync.enums.ReminderStatus;
 import com.project.finsync.model.Reminder;
-import com.project.finsync.model.User;
 import com.project.finsync.repository.ReminderRepository;
+import com.project.finsync.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReminderService {
     private final ReminderRepository reminderRepository;
+    private final UserRepository userRepository;
 
     public Iterable<Reminder> findAllReminders() {
         return reminderRepository.findAll();
@@ -26,28 +28,32 @@ public class ReminderService {
                 .orElseThrow(() -> new EntityNotFoundException("Reminder not found with id: " + reminderId));
     }
 
-    public List<Reminder> findRemindersByUser(User user) {
-        return reminderRepository.findByUser(user);
+    public List<Reminder> findRemindersByUserId(Long userId) {
+        return userRepository.findById(userId)
+                .map(reminderRepository::findByUser)
+                .orElse(Collections.emptyList());
     }
 
-    public List<Reminder> findRemindersByUserByStatus(User user, ReminderStatus status) {
-        return reminderRepository.findByUser(user)
+    public List<Reminder> findRemindersByUserByStatus(Long userId, ReminderStatus status) {
+        return findRemindersByUserId(userId)
                 .stream()
-                .filter(reminder -> reminder.getStatus().equals(status))
+                .filter(reminder -> status.equals(reminder.getStatus()))
                 .toList();
     }
 
-    public List<Reminder> findRemindersByUserByDate(User user, LocalDate date) {
-        return reminderRepository.findByUser(user)
+    public List<Reminder> findRemindersByUserByDate(Long userId, LocalDate date) {
+        return findRemindersByUserId(userId)
                 .stream()
-                .filter(reminder -> reminder.getDueDate().isEqual(date))
+                .filter(reminder -> date.isEqual(reminder.getDueDate()))
                 .toList();
     }
 
-    public Reminder createReminder(User user, Reminder reminder) {
-        reminder.setUser(user);
-        reminder.setStatus(ReminderStatus.PENDING);
-        return reminderRepository.save(reminder);
+    public Optional<Reminder> createReminder(Long userId, Reminder reminder) {
+        return userRepository.findById(userId).map(user -> {
+            reminder.setUser(user);
+            reminder.setStatus(ReminderStatus.PENDING);
+            return reminderRepository.save(reminder);
+        });
     }
 
     public Optional<Reminder> updateReminder(Long reminderId, Reminder updateReminder) {
@@ -76,8 +82,8 @@ public class ReminderService {
                 .ifPresent(reminder -> reminder.setStatus(ReminderStatus.COMPLETED));
     }
 
-    public void deleteAllUserReminders(User user) {
-        reminderRepository.findByUser(user)
+    public void deleteAllUserReminders(Long userId) {
+        findRemindersByUserId(userId)
                 .forEach(reminder -> deleteReminder(reminder.getReminderId()));
     }
 

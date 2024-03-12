@@ -18,12 +18,12 @@ public class AccountController {
 
     @GetMapping
     public Iterable<Account> findByUserId(@PathVariable Long userId) {
-        return accountService.findByUserId(userId);
+        return accountService.findAccountByUserId(userId);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Account> findByIdAndUserId(@PathVariable Long id, @PathVariable Long userId) {
-        Optional<Account> account = accountService.findByIdAndUserId(id, userId);
+        Optional<Account> account = accountService.findAccountByIdAndUserId(id, userId);
         return account.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

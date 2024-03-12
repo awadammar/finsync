@@ -15,11 +15,11 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    public Iterable<Account> findByUserId(Long userId) {
+    public Iterable<Account> findAccountByUserId(Long userId) {
         return accountRepository.findByUserId(userId);
     }
 
-    public Optional<Account> findByIdAndUserId(Long id, Long userId) {
+    public Optional<Account> findAccountByIdAndUserId(Long id, Long userId) {
         return accountRepository.findByIdAndUserId(id, userId);
     }
 
@@ -54,7 +54,7 @@ public class AccountService {
     }
 
     public void deleteByIdAndUserId(Long id, Long userId) {
-        findByIdAndUserId(id, userId).ifPresent(account ->
+        findAccountByIdAndUserId(id, userId).ifPresent(account ->
                 accountRepository.deleteById(account.getId())
         );
     }
