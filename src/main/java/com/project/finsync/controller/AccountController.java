@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/users/{userId}/accounts")
 @RequiredArgsConstructor
@@ -17,14 +15,15 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping
-    public Iterable<Account> findByUserId(@PathVariable Long userId) {
-        return accountService.findAccountByUserId(userId);
+    public Iterable<Account> findAllAccountsForUser(@PathVariable Long userId) {
+        return accountService.findAccountsByUser(userId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> findByIdAndUserId(@PathVariable Long id, @PathVariable Long userId) {
-        Optional<Account> account = accountService.findAccountByIdAndUserId(id, userId);
-        return account.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Account> findAccountByIdForUser(@PathVariable Long id, @PathVariable Long userId) {
+        return accountService.findAccountByIdAndUser(id, userId)
+                .map(value -> ResponseEntity.ok().body(value))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -35,21 +34,21 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Account> updateAccount(@PathVariable Long id, @Validated @RequestBody Account newAccount) {
-        Optional<Account> updatedAccount = accountService.updateAccount(id, newAccount);
-        return updatedAccount.map(ResponseEntity::ok)
+    ResponseEntity<Account> updateAccount(@PathVariable Long id, @PathVariable Long userId, @Validated @RequestBody Account newAccount) {
+        return accountService.updateAccount(id, userId, newAccount)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteAllUserAccounts(@PathVariable Long userId) {
-        accountService.deleteAllUserAccounts(userId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteAllAccountsForUser(@PathVariable Long userId) {
+        accountService.deleteAllAccountsByUserId(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteByIdAndUserId(@PathVariable Long id, @PathVariable Long userId) {
-        accountService.deleteByIdAndUserId(id, userId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteAccountByIdForUser(@PathVariable Long id, @PathVariable Long userId) {
+        accountService.deleteAccountByIdAndUserId(id, userId);
+        return ResponseEntity.noContent().build();
     }
 }

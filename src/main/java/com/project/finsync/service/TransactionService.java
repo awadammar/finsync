@@ -5,7 +5,6 @@ import com.project.finsync.enums.TransactionType;
 import com.project.finsync.model.Transaction;
 import com.project.finsync.repository.AccountRepository;
 import com.project.finsync.repository.TransactionRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -22,51 +21,44 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
-    public Iterable<Transaction> findAllTransactions() {
-        return transactionRepository.findAll();
+    public Optional<Transaction> findTransactionByIdAndAccount(Long transactionId, Long accountId) {
+        return transactionRepository.findByTransactionIdAndAccountId(transactionId, accountId);
     }
 
-    public Transaction findTransactionById(Long transactionId) {
-        return transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + transactionId));
-    }
-
-    public List<Transaction> findTransactionsByAccountId(Long accountId) {
-        return accountRepository.findById(accountId)
-                .map(transactionRepository::findByAccount)
-                .orElse(Collections.emptyList());
+    public List<Transaction> findTransactionsByAccount(Long accountId) {
+        return transactionRepository.findByAccountId(accountId);
     }
 
     public List<Transaction> findTransactionsByAccountByMonth(Long accountId, Month month) {
-        return findTransactionsByAccountId(accountId)
+        return findTransactionsByAccount(accountId)
                 .stream()
                 .filter(transaction -> month.equals(transaction.getDate().getMonth()))
                 .toList();
     }
 
     public List<Transaction> findTransactionsByAccountByType(Long accountId, TransactionType transactionType) {
-        return findTransactionsByAccountId(accountId)
+        return findTransactionsByAccount(accountId)
                 .stream()
                 .filter(transaction -> transactionType.equals(transaction.getType()))
                 .toList();
     }
 
     public List<Transaction> findTransactionsByAccountByCategory(Long accountId, ExpenseCategory expenseCategory) {
-        return findTransactionsByAccountId(accountId)
+        return findTransactionsByAccount(accountId)
                 .stream()
                 .filter(transaction -> expenseCategory.equals(transaction.getCategory()))
                 .toList();
     }
 
     public List<Transaction> findTransactionsByAccountByTags(Long accountId, Set<String> tags) {
-        return findTransactionsByAccountId(accountId)
+        return findTransactionsByAccount(accountId)
                 .stream()
                 .filter(transaction -> !Collections.disjoint(transaction.getTags(), tags))
                 .toList();
     }
 
     public Double getTotalAmountByAccount(Long accountId) {
-        return findTransactionsByAccountId(accountId)
+        return findTransactionsByAccount(accountId)
                 .stream()
                 .mapToDouble(Transaction::getAmount)
                 .sum();
@@ -79,8 +71,8 @@ public class TransactionService {
         });
     }
 
-    public Optional<Transaction> updateTransaction(Long transactionId, Transaction updateTransaction) {
-        return transactionRepository.findById(transactionId).map(budget -> {
+    public Optional<Transaction> updateTransaction(Long transactionId, Long accountId, Transaction updateTransaction) {
+        return findTransactionByIdAndAccount(transactionId, accountId).map(budget -> {
             if (updateTransaction.getAmount() != null) {
                 budget.setAmount(updateTransaction.getAmount());
             }
@@ -106,12 +98,15 @@ public class TransactionService {
         });
     }
 
-    public void deleteAccountTransactions(Long accountId) {
-        findTransactionsByAccountId(accountId)
-                .forEach(reminder -> deleteTransaction(reminder.getTransactionId()));
+    public void deleteAllTransactionsByAccount(Long accountId) {
+        List<Long> ids = transactionRepository.findByAccountId(accountId)
+                .stream()
+                .map(Transaction::getTransactionId)
+                .toList();
+        accountRepository.deleteAllById(ids);
     }
 
-    public void deleteTransaction(Long budgetId) {
-        transactionRepository.deleteById(budgetId);
+    public void deleteTransaction(Long transactionId, Long accountId) {
+        findTransactionByIdAndAccount(transactionId, accountId).ifPresent(transaction -> transactionRepository.deleteById(transactionId));
     }
 }

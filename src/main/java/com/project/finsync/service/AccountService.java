@@ -15,11 +15,11 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    public Iterable<Account> findAccountByUserId(Long userId) {
+    public Iterable<Account> findAccountsByUser(Long userId) {
         return accountRepository.findByUserId(userId);
     }
 
-    public Optional<Account> findAccountByIdAndUserId(Long id, Long userId) {
+    public Optional<Account> findAccountByIdAndUser(Long id, Long userId) {
         return accountRepository.findByIdAndUserId(id, userId);
     }
 
@@ -30,8 +30,8 @@ public class AccountService {
         });
     }
 
-    public Optional<Account> updateAccount(Long id, Account updateAccount) {
-        return accountRepository.findById(id).map(account -> {
+    public Optional<Account> updateAccount(Long id, Long userId, Account updateAccount) {
+        return findAccountByIdAndUser(id, userId).map(account -> {
             if (updateAccount.getName() != null) {
                 account.setName(updateAccount.getName());
             }
@@ -45,16 +45,16 @@ public class AccountService {
         });
     }
 
-    public void deleteAllUserAccounts(Long userId) {
-        List<Long> accountIds = accountRepository.findByUserId(userId)
+    public void deleteAllAccountsByUserId(Long userId) {
+        List<Long> ids = accountRepository.findByUserId(userId)
                 .stream()
                 .map(Account::getId)
                 .toList();
-        accountRepository.deleteAllById(accountIds);
+        accountRepository.deleteAllById(ids);
     }
 
-    public void deleteByIdAndUserId(Long id, Long userId) {
-        findAccountByIdAndUserId(id, userId).ifPresent(account ->
+    public void deleteAccountByIdAndUserId(Long id, Long userId) {
+        findAccountByIdAndUser(id, userId).ifPresent(account ->
                 accountRepository.deleteById(account.getId())
         );
     }

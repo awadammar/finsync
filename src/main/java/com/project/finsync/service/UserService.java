@@ -55,7 +55,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
-            accountService.deleteAllUserAccounts(user.getId());
+            accountService.deleteAllAccountsByUserId(user.getId());
             userSettingsRepository.deleteByUserId(user.getId());
             userRepository.delete(user);
         });

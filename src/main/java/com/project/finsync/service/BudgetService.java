@@ -4,12 +4,10 @@ import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.model.Budget;
 import com.project.finsync.repository.BudgetRepository;
 import com.project.finsync.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Month;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,37 +17,30 @@ public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final UserRepository userRepository;
 
-    public Iterable<Budget> findAllBudgets() {
-        return budgetRepository.findAll();
+    public Optional<Budget> findBudgetByIdAndUser(Long budgetId, Long userId) {
+        return budgetRepository.findByBudgetIdAndUserId(budgetId, userId);
     }
 
-    public Budget findBudgetById(Long budgetId) {
-        return budgetRepository.findById(budgetId)
-                .orElseThrow(() -> new EntityNotFoundException("Budget not found with id: " + budgetId));
-    }
-
-    public List<Budget> findBudgetsByUserId(Long userId) {
-        return userRepository.findById(userId)
-                .map(budgetRepository::findByUser)
-                .orElse(Collections.emptyList());
+    public List<Budget> findBudgetsByUser(Long userId) {
+        return budgetRepository.findByUserId(userId);
     }
 
     public List<Budget> findBudgetsByUserByMonth(Long userId, Month month) {
-        return findBudgetsByUserId(userId)
+        return findBudgetsByUser(userId)
                 .stream()
                 .filter(budget -> month.equals(budget.getMonth()))
                 .toList();
     }
 
     public List<Budget> findBudgetByUserByCategory(Long userId, ExpenseCategory expenseCategory) {
-        return findBudgetsByUserId(userId)
+        return findBudgetsByUser(userId)
                 .stream()
                 .filter(budget -> expenseCategory.equals(budget.getCategory()))
                 .toList();
     }
 
     public Double findTotalAmountForBudgets(Long userId) {
-        return findBudgetsByUserId(userId)
+        return findBudgetsByUser(userId)
                 .stream()
                 .mapToDouble(Budget::getAmount)
                 .sum();
@@ -62,22 +53,26 @@ public class BudgetService {
         });
     }
 
-    public Optional<Budget> updateBudget(Long budgetId, Budget updateBudget) {
-        return budgetRepository.findById(budgetId).map(budget -> {
+    public Optional<Budget> updateBudget(Long budgetId, Long userId, Budget updateBudget) {
+        return findBudgetByIdAndUser(budgetId, userId).flatMap(budget -> {
             if (updateBudget.getAmount() != null) {
                 budget.setAmount(updateBudget.getAmount());
             }
-            return budgetRepository.save(budget);
+            return Optional.of(budgetRepository.save(budget));
         });
     }
 
-    public void deleteBudgetsByCategory(Long userId, ExpenseCategory expenseCategory) {
-        findBudgetByUserByCategory(userId, expenseCategory)
-                .forEach(budget -> deleteBudget(budget.getBudgetId()));
+    public void deleteAllBudgetsByUserByCategory(Long userId, ExpenseCategory expenseCategory) {
+        List<Long> ids = budgetRepository.findByUserId(userId)
+                .stream()
+                .filter(budget -> budget.getCategory().equals(expenseCategory))
+                .map(Budget::getBudgetId)
+                .toList();
+        budgetRepository.deleteAllById(ids);
     }
 
-    public void deleteBudget(Long budgetId) {
-        budgetRepository.deleteById(budgetId);
+    public void deleteBudget(Long budgetId, Long userId) {
+        findBudgetByIdAndUser(budgetId, userId).ifPresent(budget -> budgetRepository.deleteById(budgetId));
     }
 
 }

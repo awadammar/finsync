@@ -12,11 +12,11 @@ import java.util.Optional;
 public class UserSettingsService {
     private final UserSettingsRepository userSettingsRepository;
 
-    public Optional<UserSettings> findByUserId(Long userId) {
+    public Optional<UserSettings> findSettingsByUserId(Long userId) {
         return userSettingsRepository.findByUserId(userId);
     }
 
-    public Optional<UserSettings> updateUserSettings(Long userId, UserSettings updatedUserSettings) {
+    public Optional<UserSettings> updateSettings(Long userId, UserSettings updatedUserSettings) {
         return userSettingsRepository.findByUserId(userId).map(userSettings -> {
             if (updatedUserSettings.getPushNotification() != null) {
                 userSettings.setPushNotification(updatedUserSettings.getPushNotification());
@@ -29,7 +29,7 @@ public class UserSettingsService {
     }
 
     public void deleteByUserId(Long userId) {
-        findByUserId(userId).ifPresent(userSetting ->
+        findSettingsByUserId(userId).ifPresent(userSetting ->
                 userSettingsRepository.deleteByUserId(userSetting.getUser().getId())
         );
     }
