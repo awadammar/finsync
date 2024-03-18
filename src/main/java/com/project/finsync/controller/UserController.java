@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -24,21 +24,26 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<User> findUserById(@PathVariable Long id) {
-        Optional<User> user = userService.findUserById(id);
-        return user.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
+        return userService.findUserById(id)
+                .map(value -> ResponseEntity.ok().body(value))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(@Validated @RequestBody User user) {
         User createdUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        return createdUser != null ? ResponseEntity.status(HttpStatus.CREATED).body(createdUser) :
+                ResponseEntity.badRequest().build();
+
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<User> updateUser(@PathVariable Long id, @Validated @RequestBody User newUser) {
-        Optional<User> updatedUser = userService.updateUser(id, newUser);
-        return updatedUser.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    ResponseEntity<User> updateUser(@PathVariable("id") Long id, @Valid @RequestBody User newUser) {
+        newUser.setId(id);
+        return userService.updateUser(newUser)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
+
     }
 
     @DeleteMapping("/{id}")

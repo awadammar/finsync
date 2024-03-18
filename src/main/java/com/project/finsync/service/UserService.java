@@ -27,7 +27,7 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(User user) {
+    public User createUser(User user) throws IllegalArgumentException {
         User savedUser = userRepository.save(user);
         savedUser.setPassword(user.getPassword());
 
@@ -40,21 +40,14 @@ public class UserService {
         return savedUser;
     }
 
-    public Optional<User> updateUser(Long id, User updatedUser) {
-        return userRepository.findById(id).map(user -> {
-            if (updatedUser.getEmail() != null) {
-                throw new UnsupportedOperationException("Cannot update email field");
-            }
-            if (updatedUser.getPassword() != null) {
-                user.setPassword(updatedUser.getPassword());
-            }
-            return userRepository.save(user);
-        });
+    public Optional<User> updateUser(User updatedUser) {
+        return findUserById(updatedUser.getId())
+                .map(o -> userRepository.save(updatedUser));
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        userRepository.findById(id).ifPresent(user -> {
+        findUserById(id).ifPresent(user -> {
             accountService.deleteAllAccountsByUserId(user.getId());
             userSettingsRepository.deleteByUserId(user.getId());
             userRepository.delete(user);
