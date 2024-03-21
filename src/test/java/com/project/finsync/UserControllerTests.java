@@ -96,7 +96,7 @@ class UserControllerTests {
 
         mockMvc.perform(put("/users/{id}", user.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -110,7 +110,7 @@ class UserControllerTests {
 
         mockMvc.perform(put("/users/{id}", user.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(updatedUser.getEmail()));
     }
