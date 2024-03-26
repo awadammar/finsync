@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -53,7 +55,7 @@ class UserSettingsControllerTests {
         mockMvc.perform(get("/users/1/settings"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user.id").value(1))
-                .andExpect(jsonPath("$.notificationEnabled").value(true));
+                .andExpect(jsonPath("$.pushNotification").value(true));
     }
 
     @Test
@@ -66,18 +68,20 @@ class UserSettingsControllerTests {
 
     @Test
     void testUpdateSettings_SettingsUpdated() throws Exception {
-        UserSettings newUserSettings = new UserSettings();
-        newUserSettings.setUser(user);
-        newUserSettings.setPushNotification(true);
+        UserSettings userSettings = new UserSettings(user);
 
-        when(userSettingsService.updateSettings(1L, newUserSettings)).thenReturn(Optional.of(newUserSettings));
+        UserSettings updatedUserSettings = new UserSettings(user);
+        updatedUserSettings.setPushNotification(false);
+
+        when(userSettingsService.findSettingsByUserId(1L)).thenReturn(Optional.of(userSettings));
+        when(userSettingsService.updateSettings(anyLong(), any(UserSettings.class))).thenReturn(Optional.of(updatedUserSettings));
 
         mockMvc.perform(put("/users/1/settings")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUserSettings)))
+                        .content(objectMapper.writeValueAsString(updatedUserSettings)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user.id").value(1))
-                .andExpect(jsonPath("$.notificationEnabled").value(true));
+                .andExpect(jsonPath("$.pushNotification").value(false));
     }
 
     @Test

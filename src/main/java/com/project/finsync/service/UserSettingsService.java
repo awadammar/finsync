@@ -17,7 +17,7 @@ public class UserSettingsService {
     }
 
     public Optional<UserSettings> updateSettings(Long userId, UserSettings updatedUserSettings) {
-        return userSettingsRepository.findByUserId(userId).map(userSettings -> {
+        return findSettingsByUserId(userId).map(userSettings -> {
             if (updatedUserSettings.getPushNotification() != null) {
                 userSettings.setPushNotification(updatedUserSettings.getPushNotification());
             }
