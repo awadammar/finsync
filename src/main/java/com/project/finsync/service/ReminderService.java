@@ -42,7 +42,6 @@ public class ReminderService {
     public Optional<Reminder> createReminder(Long userId, Reminder reminder) {
         return userRepository.findById(userId).map(user -> {
             reminder.setUser(user);
-            reminder.setStatus(ReminderStatus.PENDING);
             return reminderRepository.save(reminder);
         });
     }

@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-import static com.project.finsync.enums.ReminderStatus.PENDING;
+import static com.project.finsync.enums.ReminderStatus.ACTIVE;
 
 @Getter
 @Setter
@@ -32,9 +32,11 @@ public class Reminder {
     @Enumerated(EnumType.STRING)
     private ReminderStatus status;
 
-    public Reminder(ReminderType type) {
+    public Reminder(User user, ReminderType type, String description) {
+        this.user = user;
         this.type = type;
-        this.description = "";
-        this.status = PENDING;
+        this.description = description;
+        this.status = ACTIVE;
     }
+
 }

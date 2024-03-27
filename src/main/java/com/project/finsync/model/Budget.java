@@ -3,14 +3,12 @@ package com.project.finsync.model;
 import com.project.finsync.enums.ExpenseCategory;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Month;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "budgets")
 public class Budget {
@@ -28,4 +26,10 @@ public class Budget {
     @Enumerated(EnumType.STRING)
     private ExpenseCategory category;
 
+    public Budget(User user, Double amount, Month month, ExpenseCategory category) {
+        this.user = user;
+        this.amount = amount;
+        this.month = month;
+        this.category = category;
+    }
 }

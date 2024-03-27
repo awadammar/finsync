@@ -1,7 +1,7 @@
 package com.project.finsync.enums;
 
 public enum ReminderStatus {
-    PENDING,
+    ACTIVE,
     COMPLETED,
     OVERDUE
 }

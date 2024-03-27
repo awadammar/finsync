@@ -3,12 +3,12 @@ package com.project.finsync.model;
 import com.project.finsync.enums.AccountType;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Currency;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Table(name = "accounts")
 @Entity
 public class Account {
@@ -25,7 +25,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType type;
     private String name;
-    private String currency;
+    private Currency currency;
 
     public Account(User user) {
         this.user = user;
@@ -33,9 +33,10 @@ public class Account {
         this.type = AccountType.PERSONAL;
     }
 
-    public Account(User user, String name, AccountType type) {
+    public Account(User user, String name, AccountType type, Currency currency) {
         this.user = user;
         this.name = name;
         this.type = type;
+        this.currency = currency;
     }
 }

@@ -1,7 +1,7 @@
-package com.project.finsync;
+package com.project.finsync.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.finsync.controller.AccountController;
+import com.project.finsync.TestUtils;
 import com.project.finsync.enums.AccountType;
 import com.project.finsync.model.Account;
 import com.project.finsync.model.User;
@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import java.util.Currency;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -39,8 +40,7 @@ class AccountControllerTests {
 
     @BeforeEach
     void setUp() {
-        user = new User("test@example.com", "password");
-        user.setId(1L);
+        user = TestUtils.createSimpleUser();
 
         account = new Account(user);
         account.setId(1L);
@@ -104,7 +104,7 @@ class AccountControllerTests {
 
     @Test
     void testUpdateAccount_AccountUpdated() throws Exception {
-        Account updatedAccount = new Account(user, "testAcc", AccountType.BUSINESS);
+        Account updatedAccount = new Account(user, "testAcc", AccountType.BUSINESS, Currency.getInstance("EGP"));
         updatedAccount.setId(1L);
 
         when(accountService.updateAccount(anyLong(), anyLong(), any(Account.class))).thenReturn(Optional.of(updatedAccount));
@@ -113,7 +113,7 @@ class AccountControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(account)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value(AccountType.BUSINESS.name()));
+                .andExpect(jsonPath("$.type").value(updatedAccount.getType().name()));
     }
 
     @Test

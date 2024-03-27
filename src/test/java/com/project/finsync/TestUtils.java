@@ -3,11 +3,9 @@ package com.project.finsync;
 import com.project.finsync.model.User;
 
 public class TestUtils {
-    public static User createBasicUser() {
-        User user = new User();
+    public static User createSimpleUser() {
+        User user = new User("test@example.com", "password");
         user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setPassword("password");
         return user;
     }
 }

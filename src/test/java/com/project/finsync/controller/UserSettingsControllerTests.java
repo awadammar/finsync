@@ -1,7 +1,7 @@
-package com.project.finsync;
+package com.project.finsync.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.finsync.controller.UserSettingsController;
+import com.project.finsync.TestUtils;
 import com.project.finsync.model.User;
 import com.project.finsync.model.UserSettings;
 import com.project.finsync.service.UserSettingsService;
@@ -38,8 +38,7 @@ class UserSettingsControllerTests {
 
     @BeforeEach
     void setUp() {
-        user = new User("test@example.com", "password");
-        user.setId(1L);
+        user = TestUtils.createSimpleUser();
     }
 
     @Test
@@ -76,7 +75,7 @@ class UserSettingsControllerTests {
                         .content(objectMapper.writeValueAsString(updatedUserSettings)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user.id").value(1))
-                .andExpect(jsonPath("$.pushNotification").value(false));
+                .andExpect(jsonPath("$.pushNotification").value(updatedUserSettings.getPushNotification()));
     }
 
     @Test

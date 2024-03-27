@@ -4,16 +4,15 @@ import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.geo.Point;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "transactions")
 public class Transaction {
@@ -34,4 +33,14 @@ public class Transaction {
     private ExpenseCategory category;
     private Set<String> tags;
     private Point location;
+
+    public Transaction(Account account, TransactionType type, Double amount, LocalDate date, ExpenseCategory category) {
+        this.account = account;
+        this.type = type;
+        this.amount = amount;
+        this.date = date;
+        this.category = category;
+        this.description = "";
+        this.tags = new HashSet<>();
+    }
 }

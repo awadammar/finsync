@@ -1,7 +1,7 @@
-package com.project.finsync;
+package com.project.finsync.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.finsync.controller.UserController;
+import com.project.finsync.TestUtils;
 import com.project.finsync.model.User;
 import com.project.finsync.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +33,12 @@ class UserControllerTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
     private User user;
 
     @BeforeEach
     void setUp() {
-        user = new User("test@example.com", "password");
-        user.setId(1L);
+        user = TestUtils.createSimpleUser();
     }
 
     @Test
