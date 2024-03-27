@@ -37,10 +37,8 @@ class UserControllerTests {
 
     @BeforeEach
     void setUp() {
-        user = new User();
+        user = new User("test@example.com", "password");
         user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setPassword("password");
     }
 
     @Test
@@ -105,7 +103,6 @@ class UserControllerTests {
         User updatedUser = new User("updated@example.com", "updatedPassword");
         updatedUser.setId(1L);
 
-        when(userService.findUserById(1L)).thenReturn(Optional.of(user));
         when(userService.updateUser(any(User.class))).thenReturn(Optional.of(updatedUser));
 
         mockMvc.perform(put("/users/{id}", user.getId())

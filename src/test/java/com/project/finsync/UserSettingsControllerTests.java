@@ -38,10 +38,8 @@ class UserSettingsControllerTests {
 
     @BeforeEach
     void setUp() {
-        user = new User();
+        user = new User("test@example.com", "password");
         user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setPassword("password");
     }
 
     @Test
@@ -68,12 +66,9 @@ class UserSettingsControllerTests {
 
     @Test
     void testUpdateSettings_SettingsUpdated() throws Exception {
-        UserSettings userSettings = new UserSettings(user);
-
         UserSettings updatedUserSettings = new UserSettings(user);
         updatedUserSettings.setPushNotification(false);
 
-        when(userSettingsService.findSettingsByUserId(1L)).thenReturn(Optional.of(userSettings));
         when(userSettingsService.updateSettings(anyLong(), any(UserSettings.class))).thenReturn(Optional.of(updatedUserSettings));
 
         mockMvc.perform(put("/users/1/settings")
