@@ -32,8 +32,8 @@ public class AccountService {
 
     public Optional<Account> updateAccount(Long id, Long userId, Account updateAccount) {
         return findAccountByIdAndUser(id, userId).map(account -> {
-            if (updateAccount.getName() != null) {
-                account.setName(updateAccount.getName());
+            if (updateAccount.getNumber() != null) {
+                account.setNumber(updateAccount.getNumber());
             }
             if (updateAccount.getType() != null) {
                 account.setType(updateAccount.getType());

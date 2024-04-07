@@ -13,7 +13,6 @@ import java.util.Optional;
 @RequestMapping("/users/{userId}/settings")
 @RequiredArgsConstructor
 public class UserSettingsController {
-
     private final UserSettingsService userSettingsService;
 
     @GetMapping

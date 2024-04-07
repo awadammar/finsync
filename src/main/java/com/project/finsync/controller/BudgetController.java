@@ -14,7 +14,6 @@ import java.time.Month;
 @RequestMapping("/users/{userId}/budgets")
 @RequiredArgsConstructor
 public class BudgetController {
-
     private final BudgetService budgetService;
 
     @GetMapping

@@ -14,7 +14,6 @@ import java.time.LocalDate;
 @RequestMapping("/users/{userId}/reminders")
 @RequiredArgsConstructor
 public class ReminderController {
-
     private final ReminderService reminderService;
 
     @GetMapping

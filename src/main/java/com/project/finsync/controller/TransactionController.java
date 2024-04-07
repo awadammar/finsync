@@ -18,7 +18,6 @@ import java.util.Set;
 @RequestMapping("/accounts/{accountId}/transactions")
 @RequiredArgsConstructor
 public class TransactionController {
-
     private final TransactionService transactionService;
 
     @GetMapping("/{transactionId}")

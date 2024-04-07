@@ -14,7 +14,6 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
 
     @GetMapping
@@ -43,7 +42,6 @@ public class UserController {
         return userService.updateUser(newUser)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
-
     }
 
     @DeleteMapping("/{id}")

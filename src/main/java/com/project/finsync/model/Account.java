@@ -24,18 +24,18 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     private AccountType type;
-    private String name;
+    private String number;
     private Currency currency;
 
     public Account(User user) {
         this.user = user;
-        this.name = ACCOUNT_DEFAULT_NAME;
+        this.number = ACCOUNT_DEFAULT_NAME;
         this.type = AccountType.PERSONAL;
     }
 
-    public Account(User user, String name, AccountType type, Currency currency) {
+    public Account(User user, String number, AccountType type, Currency currency) {
         this.user = user;
-        this.name = name;
+        this.number = number;
         this.type = type;
         this.currency = currency;
     }
