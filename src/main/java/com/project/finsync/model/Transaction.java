@@ -31,16 +31,24 @@ public class Transaction {
     private LocalDate date;
     private String description;
     private ExpenseCategory category;
-    private Set<String> tags;
     private Point location;
+    private Set<String> tags = new HashSet<>();
 
-    public Transaction(Account account, TransactionType type, Double amount, LocalDate date, ExpenseCategory category) {
+
+    public Transaction(Account account, Double amount, LocalDate date, TransactionType type) {
+        this.account = account;
+        this.amount = amount;
+        this.date = date;
+        this.type = type;
+        this.description = "";
+    }
+
+    public Transaction(Account account, Double amount, LocalDate date, TransactionType type, ExpenseCategory category) {
         this.account = account;
         this.type = type;
         this.amount = amount;
         this.date = date;
         this.category = category;
         this.description = "";
-        this.tags = new HashSet<>();
     }
 }

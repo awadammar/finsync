@@ -33,6 +33,11 @@ public class Account {
         this.type = AccountType.PERSONAL;
     }
 
+    public Account(User user, String number) {
+        this.user = user;
+        this.number = number;
+    }
+
     public Account(User user, String number, AccountType type, Currency currency) {
         this.user = user;
         this.number = number;

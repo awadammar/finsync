@@ -50,7 +50,7 @@ class TransactionControllerTests {
         account = new Account(user);
         account.setId(1L);
 
-        transaction = new Transaction(account, TransactionType.OTHER, 1000.0, LocalDate.of(2024, 12, 12), ExpenseCategory.GROCERIES);
+        transaction = new Transaction(account, 1000.0, LocalDate.of(2024, 12, 12), TransactionType.OTHER, ExpenseCategory.GROCERIES);
         transaction.setTransactionId(1L);
     }
 
@@ -86,7 +86,7 @@ class TransactionControllerTests {
 
     @Test
     void testFindTransactionsByAccountByType() throws Exception {
-        when(transactionService.findTransactionsByAccountByType(1L, TransactionType.INCOME)).thenReturn(Collections.singletonList(transaction));
+        when(transactionService.findTransactionsByAccountByType(1L, TransactionType.CREDITED)).thenReturn(Collections.singletonList(transaction));
 
         mockMvc.perform(get("/accounts/1/transactions/type/INCOME"))
                 .andExpect(status().isOk())
@@ -136,7 +136,7 @@ class TransactionControllerTests {
 
     @Test
     void testUpdateTransaction() throws Exception {
-        Transaction updatedTransaction = new Transaction(account, TransactionType.OTHER, 1000.0, LocalDate.of(2024, 12, 12), ExpenseCategory.EDUCATION);
+        Transaction updatedTransaction = new Transaction(account, 1000.0, LocalDate.of(2024, 12, 12), TransactionType.OTHER, ExpenseCategory.EDUCATION);
         updatedTransaction.setTransactionId(1L);
 
         when(transactionService.updateTransaction(anyLong(), anyLong(), any(Transaction.class))).thenReturn(Optional.of(updatedTransaction));
