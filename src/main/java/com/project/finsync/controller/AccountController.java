@@ -2,10 +2,10 @@ package com.project.finsync.controller;
 
 import com.project.finsync.model.Account;
 import com.project.finsync.service.AccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,14 +27,14 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<Account> createAccount(@PathVariable Long userId, @Validated @RequestBody Account account) {
+    public ResponseEntity<Account> createAccount(@PathVariable Long userId, @Valid @RequestBody Account account) {
         return accountService.createAccount(userId, account)
                 .map(createdAccount -> ResponseEntity.status(HttpStatus.CREATED).body(createdAccount))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Account> updateAccount(@PathVariable Long id, @PathVariable Long userId, @Validated @RequestBody Account newAccount) {
+    ResponseEntity<Account> updateAccount(@PathVariable Long id, @PathVariable Long userId, @Valid @RequestBody Account newAccount) {
         return accountService.updateAccount(id, userId, newAccount)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
