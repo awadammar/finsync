@@ -18,7 +18,7 @@ public class BudgetService {
     private final UserRepository userRepository;
 
     public Optional<Budget> findBudgetByIdAndUser(Long budgetId, Long userId) {
-        return budgetRepository.findByBudgetIdAndUserId(budgetId, userId);
+        return budgetRepository.findByIdAndUserId(budgetId, userId);
     }
 
     public List<Budget> findBudgetsByUser(Long userId) {
@@ -66,7 +66,7 @@ public class BudgetService {
         List<Long> ids = budgetRepository.findByUserId(userId)
                 .stream()
                 .filter(budget -> budget.getCategory().equals(expenseCategory))
-                .map(Budget::getBudgetId)
+                .map(Budget::getId)
                 .toList();
         budgetRepository.deleteAllById(ids);
     }

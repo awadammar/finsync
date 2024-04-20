@@ -3,6 +3,7 @@ package com.project.finsync.controller;
 import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.model.Budget;
 import com.project.finsync.service.BudgetService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,14 +45,14 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ResponseEntity<Budget> createBudget(@PathVariable Long userId, @RequestBody Budget budget) {
+    public ResponseEntity<Budget> createBudget(@PathVariable Long userId, @Valid @RequestBody Budget budget) {
         return budgetService.createBudget(userId, budget)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value))
                 .orElse(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{budgetId}")
-    public ResponseEntity<Budget> updateBudget(@PathVariable Long budgetId, @PathVariable Long userId, @RequestBody Budget updateBudget) {
+    public ResponseEntity<Budget> updateBudget(@PathVariable Long budgetId, @PathVariable Long userId, @Valid @RequestBody Budget updateBudget) {
         return budgetService.updateBudget(budgetId, userId, updateBudget)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

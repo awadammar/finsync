@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface BudgetRepository extends CrudRepository<Budget, Long> {
     List<Budget> findByUserId(Long userId);
 
-    Optional<Budget> findByBudgetIdAndUserId(Long id, Long userId);
+    Optional<Budget> findByIdAndUserId(Long id, Long userId);
 
 }
