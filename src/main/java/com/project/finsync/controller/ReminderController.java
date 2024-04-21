@@ -3,6 +3,7 @@ package com.project.finsync.controller;
 import com.project.finsync.enums.ReminderStatus;
 import com.project.finsync.model.Reminder;
 import com.project.finsync.service.ReminderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +33,14 @@ public class ReminderController {
     }
 
     @PostMapping
-    public ResponseEntity<Reminder> createReminderForUser(@PathVariable Long userId, @RequestBody Reminder reminder) {
+    public ResponseEntity<Reminder> createReminderForUser(@PathVariable Long userId, @Valid @RequestBody Reminder reminder) {
         return reminderService.createReminder(userId, reminder)
                 .map(createdReminder -> ResponseEntity.status(HttpStatus.CREATED).body(createdReminder))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{reminderId}")
-    public ResponseEntity<Reminder> updateReminder(@PathVariable Long reminderId, @PathVariable Long userId, @RequestBody Reminder reminder) {
+    public ResponseEntity<Reminder> updateReminder(@PathVariable Long reminderId, @PathVariable Long userId, @Valid @RequestBody Reminder reminder) {
         return reminderService.updateReminder(reminderId, userId, reminder)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

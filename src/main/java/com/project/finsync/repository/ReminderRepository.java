@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface ReminderRepository extends CrudRepository<Reminder, Long> {
     List<Reminder> findByUserId(Long userId);
 
-    Optional<Reminder> findByReminderIdAndUserId(Long id, Long userId);
+    Optional<Reminder> findByIdAndUserId(Long id, Long userId);
 
 }

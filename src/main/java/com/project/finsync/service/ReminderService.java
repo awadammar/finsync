@@ -18,7 +18,7 @@ public class ReminderService {
     private final UserRepository userRepository;
 
     public Optional<Reminder> findReminderByIdAndUser(Long reminderId, Long userId) {
-        return reminderRepository.findByReminderIdAndUserId(reminderId, userId);
+        return reminderRepository.findByIdAndUserId(reminderId, userId);
     }
 
     public List<Reminder> findRemindersByUser(Long userId) {
@@ -75,12 +75,12 @@ public class ReminderService {
     public void deleteAllRemindersByUser(Long userId) {
         List<Long> ids = reminderRepository.findByUserId(userId)
                 .stream()
-                .map(Reminder::getReminderId)
+                .map(Reminder::getId)
                 .toList();
         reminderRepository.deleteAllById(ids);
 
         findRemindersByUser(userId)
-                .forEach(reminder -> deleteReminder(reminder.getReminderId(), userId));
+                .forEach(reminder -> deleteReminder(reminder.getId(), userId));
     }
 
     public void deleteReminder(Long reminderId, Long userId) {
