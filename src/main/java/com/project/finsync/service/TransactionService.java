@@ -22,7 +22,7 @@ public class TransactionService {
     private final AccountRepository accountRepository;
 
     public Optional<Transaction> findTransactionByIdAndAccount(Long transactionId, Long accountId) {
-        return transactionRepository.findByTransactionIdAndAccountId(transactionId, accountId);
+        return transactionRepository.findByIdAndAccountId(transactionId, accountId);
     }
 
     public List<Transaction> findTransactionsByAccount(Long accountId) {
@@ -101,7 +101,7 @@ public class TransactionService {
     public void deleteAllTransactionsByAccount(Long accountId) {
         List<Long> ids = transactionRepository.findByAccountId(accountId)
                 .stream()
-                .map(Transaction::getTransactionId)
+                .map(Transaction::getId)
                 .toList();
         accountRepository.deleteAllById(ids);
     }

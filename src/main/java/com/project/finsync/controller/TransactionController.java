@@ -4,6 +4,7 @@ import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.enums.TransactionType;
 import com.project.finsync.model.Transaction;
 import com.project.finsync.service.TransactionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,14 +59,14 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@PathVariable Long accountId, @RequestBody Transaction transaction) {
+    public ResponseEntity<Transaction> createTransaction(@PathVariable Long accountId, @Valid @RequestBody Transaction transaction) {
         Optional<Transaction> createdTransaction = transactionService.createTransaction(accountId, transaction);
         return createdTransaction.map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value))
                 .orElse(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{transactionId}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long transactionId, @PathVariable Long accountId, @RequestBody Transaction transaction) {
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long transactionId, @PathVariable Long accountId, @Valid @RequestBody Transaction transaction) {
         Optional<Transaction> updatedTransaction = transactionService.updateTransaction(transactionId, accountId, transaction);
         return updatedTransaction.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

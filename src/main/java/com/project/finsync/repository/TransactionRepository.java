@@ -10,6 +10,6 @@ public interface TransactionRepository extends CrudRepository<Transaction, Long>
 
     List<Transaction> findByAccountId(Long accountId);
 
-    Optional<Transaction> findByTransactionIdAndAccountId(Long id, Long userId);
+    Optional<Transaction> findByIdAndAccountId(Long id, Long userId);
 
 }

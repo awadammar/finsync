@@ -2,36 +2,50 @@ package com.project.finsync.model;
 
 import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.enums.TransactionType;
+import com.project.finsync.validation.EnumValidator;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.geo.Point;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @Entity
-@Table(name = "transactions")
+@NoArgsConstructor
+@Table(name = "user_transactions")
 public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long transactionId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
 
     @Enumerated(EnumType.STRING)
+    @EnumValidator(enumClazz = TransactionType.class)
     private TransactionType type;
+
+    @Positive(message = "Budget amount must be a positive value")
     private Double amount;
+
+    @PastOrPresent(message = "Due date must be less than or equal today")
     private LocalDate date;
-    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @EnumValidator(enumClazz = ExpenseCategory.class)
     private ExpenseCategory category;
+
     private Point location;
+
+    private String description;
+
     private Set<String> tags = new HashSet<>();
 
 
