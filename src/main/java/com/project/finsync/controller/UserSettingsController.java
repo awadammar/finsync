@@ -2,9 +2,9 @@ package com.project.finsync.controller;
 
 import com.project.finsync.model.UserSettings;
 import com.project.finsync.service.UserSettingsService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class UserSettingsController {
     }
 
     @PutMapping
-    ResponseEntity<UserSettings> updateSettings(@PathVariable Long userId, @Validated @RequestBody UserSettings newUserSettings) {
+    ResponseEntity<UserSettings> updateSettings(@PathVariable Long userId, @Valid @RequestBody UserSettings newUserSettings) {
         Optional<UserSettings> updatedUserSettings = userSettingsService.updateSettings(userId, newUserSettings);
         return updatedUserSettings.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

@@ -1,13 +1,11 @@
 package com.project.finsync.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 @Entity
-@Table(name = "settings")
+@Table(name = "user_settings")
 public class UserSettings {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +15,10 @@ public class UserSettings {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "push_notification")
     private Boolean pushNotification;
+
+    @Column(name = "delete_account")
     private Boolean deleteAccount;
 
     public UserSettings() {

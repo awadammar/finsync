@@ -1,14 +1,15 @@
 package com.project.finsync.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
 @Entity
+@NoArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
@@ -19,6 +20,8 @@ public class User {
     @NotBlank(message = "E-mail address must not be empty")
     @Email(message = "User must have valid email address")
     private String email;
+
+    @JsonIgnore
     @Column(nullable = false)
     private String password; // Note: In production, use proper encryption/hashing
 
