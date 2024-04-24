@@ -9,6 +9,7 @@ import com.project.finsync.service.BudgetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BudgetController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class BudgetControllerTests {
 
     @Autowired
@@ -45,7 +47,7 @@ class BudgetControllerTests {
         user = TestUtils.createSimpleUser();
 
         budget = new Budget(user, 500.5, Month.JANUARY, ExpenseCategory.GROCERIES);
-        budget.setBudgetId(1L);
+        budget.setId(1L);
     }
 
     @Test
@@ -55,7 +57,7 @@ class BudgetControllerTests {
         mockMvc.perform(get("/users/1/budgets"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].budgetId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
@@ -64,7 +66,7 @@ class BudgetControllerTests {
 
         mockMvc.perform(get("/users/1/budgets/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.budgetId").exists());
+                .andExpect(jsonPath("$.id").exists());
     }
 
     @Test
@@ -74,22 +76,22 @@ class BudgetControllerTests {
         mockMvc.perform(get("/users/1/budgets/month/JANUARY"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].budgetId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
     void testFindBudgetByCategoryForUser() throws Exception {
-        when(budgetService.findBudgetByUserByCategory(1L, ExpenseCategory.GROCERIES)).thenReturn(Collections.singletonList(budget));
+        when(budgetService.findBudgetsByUserByCategory(1L, ExpenseCategory.GROCERIES)).thenReturn(Collections.singletonList(budget));
 
         mockMvc.perform(get("/users/1/budgets/category/GROCERIES"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].budgetId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
     void testFindTotalAmountForBudgets() throws Exception {
-        when(budgetService.findTotalAmountForBudgets(1L)).thenReturn(1000.0);
+        when(budgetService.findTotalAmountOfBudgets(1L)).thenReturn(1000.0);
 
         mockMvc.perform(get("/users/1/budgets/total-amount"))
                 .andExpect(status().isOk())
@@ -104,13 +106,13 @@ class BudgetControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(budget)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.budgetId").exists());
+                .andExpect(jsonPath("$.id").exists());
     }
 
     @Test
     void testUpdateBudget() throws Exception {
         Budget updatedBudget = new Budget(user, 500.5, Month.DECEMBER, ExpenseCategory.GROCERIES);
-        updatedBudget.setBudgetId(1L);
+        updatedBudget.setId(1L);
 
         when(budgetService.updateBudget(anyLong(), anyLong(), any(Budget.class))).thenReturn(Optional.of(updatedBudget));
 
@@ -118,7 +120,7 @@ class BudgetControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(budget)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.budgetId").exists())
+                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.month").value(updatedBudget.getMonth().name()));
 
     }

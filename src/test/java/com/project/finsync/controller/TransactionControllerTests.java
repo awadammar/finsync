@@ -11,6 +11,7 @@ import com.project.finsync.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TransactionController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TransactionControllerTests {
 
     @Autowired
@@ -51,7 +53,7 @@ class TransactionControllerTests {
         account.setId(1L);
 
         transaction = new Transaction(account, 1000.0, LocalDate.of(2024, 12, 12), TransactionType.OTHER, ExpenseCategory.GROCERIES);
-        transaction.setTransactionId(1L);
+        transaction.setId(1L);
     }
 
     @Test
@@ -60,7 +62,7 @@ class TransactionControllerTests {
 
         mockMvc.perform(get("/accounts/1/transactions/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.transactionId").exists());
+                .andExpect(jsonPath("$.id").exists());
     }
 
     @Test
@@ -70,7 +72,7 @@ class TransactionControllerTests {
         mockMvc.perform(get("/accounts/1/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].transactionId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
 
@@ -81,17 +83,17 @@ class TransactionControllerTests {
         mockMvc.perform(get("/accounts/1/transactions/month/JANUARY"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].transactionId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
     void testFindTransactionsByAccountByType() throws Exception {
         when(transactionService.findTransactionsByAccountByType(1L, TransactionType.CREDITED)).thenReturn(Collections.singletonList(transaction));
 
-        mockMvc.perform(get("/accounts/1/transactions/type/INCOME"))
+        mockMvc.perform(get("/accounts/1/transactions/type/CREDITED"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].transactionId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
@@ -101,7 +103,7 @@ class TransactionControllerTests {
         mockMvc.perform(get("/accounts/1/transactions/category/GROCERIES"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].transactionId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
@@ -111,7 +113,7 @@ class TransactionControllerTests {
         mockMvc.perform(get("/accounts/1/transactions/tags").param("tags", "tag1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].transactionId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
@@ -131,13 +133,13 @@ class TransactionControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transaction)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.transactionId").exists());
+                .andExpect(jsonPath("$.id").exists());
     }
 
     @Test
     void testUpdateTransaction() throws Exception {
         Transaction updatedTransaction = new Transaction(account, 1000.0, LocalDate.of(2024, 12, 12), TransactionType.OTHER, ExpenseCategory.EDUCATION);
-        updatedTransaction.setTransactionId(1L);
+        updatedTransaction.setId(1L);
 
         when(transactionService.updateTransaction(anyLong(), anyLong(), any(Transaction.class))).thenReturn(Optional.of(updatedTransaction));
 
@@ -145,7 +147,7 @@ class TransactionControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(transaction)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.transactionId").exists())
+                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.category").value(updatedTransaction.getCategory().name()));
     }
 

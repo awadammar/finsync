@@ -9,6 +9,7 @@ import com.project.finsync.service.ReminderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReminderController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ReminderControllerTests {
 
     @Autowired
@@ -45,7 +47,7 @@ class ReminderControllerTests {
         User user = TestUtils.createSimpleUser();
 
         reminder = new Reminder(user, BILL_PAYMENT, "");
-        reminder.setReminderId(1L);
+        reminder.setId(1L);
     }
 
     @Test
@@ -55,7 +57,7 @@ class ReminderControllerTests {
         mockMvc.perform(get("/users/1/reminders"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].reminderId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
@@ -65,7 +67,7 @@ class ReminderControllerTests {
         mockMvc.perform(get("/users/1/reminders/status/ACTIVE"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].reminderId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
@@ -76,7 +78,7 @@ class ReminderControllerTests {
         mockMvc.perform(get("/users/1/reminders/date/" + date))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].reminderId").exists());
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
@@ -87,7 +89,7 @@ class ReminderControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(reminder)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.reminderId").exists());
+                .andExpect(jsonPath("$.id").exists());
     }
 
     @Test
@@ -111,14 +113,14 @@ class ReminderControllerTests {
     @Test
     void testUpdateReminder_ReminderUpdated() throws Exception {
         Reminder updatedReminder = reminder;
-        updatedReminder.setReminderId(1L);
+        updatedReminder.setId(1L);
         when(reminderService.updateReminder(anyLong(), anyLong(), any(Reminder.class))).thenReturn(Optional.of(updatedReminder));
 
         mockMvc.perform(put("/users/1/reminders/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(reminder)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.reminderId").value(1));
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
