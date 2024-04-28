@@ -7,12 +7,17 @@ import com.project.finsync.repository.UserRepository;
 import com.project.finsync.repository.UserSettingsRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = {"users"})
 public class UserService {
     private final UserRepository userRepository;
     private final AccountService accountService;
@@ -22,6 +27,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Cacheable(key = "#id")
     public Optional<User> findUserById(Long id) {
         return userRepository.findById(id);
     }
@@ -40,12 +46,14 @@ public class UserService {
         return savedUser;
     }
 
+    @CachePut(key = "#updatedUser.id")
     public Optional<User> updateUser(User updatedUser) {
         return findUserById(updatedUser.getId())
                 .map(o -> userRepository.save(updatedUser));
     }
 
     @Transactional
+    @CacheEvict(key = "#userId")
     public void deleteUser(Long id) {
         findUserById(id).ifPresent(user -> {
             accountService.deleteAllAccountsByUserId(user.getId());

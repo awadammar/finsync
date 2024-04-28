@@ -5,6 +5,10 @@ import com.project.finsync.model.Reminder;
 import com.project.finsync.repository.ReminderRepository;
 import com.project.finsync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,16 +17,19 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = {"reminders"})
 public class ReminderService {
     private final ReminderRepository reminderRepository;
     private final UserRepository userRepository;
 
-    public Optional<Reminder> findReminderByIdAndUser(Long reminderId, Long userId) {
-        return reminderRepository.findByIdAndUserId(reminderId, userId);
-    }
-
+    @Cacheable(key = "#userId")
     public List<Reminder> findRemindersByUser(Long userId) {
         return reminderRepository.findByUserId(userId);
+    }
+
+    @Cacheable(key = "#reminderId + #userId")
+    public Optional<Reminder> findReminderByIdAndUser(Long reminderId, Long userId) {
+        return reminderRepository.findByIdAndUserId(reminderId, userId);
     }
 
     public List<Reminder> findRemindersByUserByStatus(Long userId, ReminderStatus status) {
@@ -51,6 +58,7 @@ public class ReminderService {
                 .ifPresent(reminder -> reminder.setStatus(ReminderStatus.COMPLETED));
     }
 
+    @CachePut(key = "#reminderId + #userId")
     public Optional<Reminder> updateReminder(Long reminderId, Long userId, Reminder updateReminder) {
         return findReminderByIdAndUser(reminderId, userId).map(reminder -> {
             if (updateReminder.getStatus() != null) {
@@ -72,6 +80,7 @@ public class ReminderService {
         });
     }
 
+    @CacheEvict(key = "#userId")
     public void deleteAllRemindersByUser(Long userId) {
         List<Long> ids = reminderRepository.findByUserId(userId)
                 .stream()
@@ -83,6 +92,7 @@ public class ReminderService {
                 .forEach(reminder -> deleteReminder(reminder.getId(), userId));
     }
 
+    @CacheEvict(key = "#reminderId + #userId")
     public void deleteReminder(Long reminderId, Long userId) {
         findReminderByIdAndUser(reminderId, userId).ifPresent(reminder -> reminderRepository.deleteById(reminderId));
     }

@@ -6,6 +6,10 @@ import com.project.finsync.model.Transaction;
 import com.project.finsync.repository.AccountRepository;
 import com.project.finsync.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -17,16 +21,19 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = {"transactions"})
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
-    public Optional<Transaction> findTransactionByIdAndAccount(Long transactionId, Long accountId) {
-        return transactionRepository.findByIdAndAccountId(transactionId, accountId);
-    }
-
+    @Cacheable(key = "#accountId")
     public List<Transaction> findTransactionsByAccount(Long accountId) {
         return transactionRepository.findByAccountId(accountId);
+    }
+
+    @Cacheable(key = "#transactionId + #accountId")
+    public Optional<Transaction> findTransactionByIdAndAccount(Long transactionId, Long accountId) {
+        return transactionRepository.findByIdAndAccountId(transactionId, accountId);
     }
 
     public List<Transaction> findTransactionsByAccountByMonth(Long accountId, Month month) {
@@ -71,6 +78,7 @@ public class TransactionService {
         });
     }
 
+    @CachePut(key = "#transactionId + #accountId")
     public Optional<Transaction> updateTransaction(Long transactionId, Long accountId, Transaction updateTransaction) {
         return findTransactionByIdAndAccount(transactionId, accountId).map(budget -> {
             if (updateTransaction.getAmount() != null) {
@@ -98,6 +106,7 @@ public class TransactionService {
         });
     }
 
+    @CacheEvict(key = "#accountId")
     public void deleteAllTransactionsByAccount(Long accountId) {
         List<Long> ids = transactionRepository.findByAccountId(accountId)
                 .stream()
@@ -106,6 +115,7 @@ public class TransactionService {
         accountRepository.deleteAllById(ids);
     }
 
+    @CacheEvict(key = "#transactionId + #accountId")
     public void deleteTransaction(Long transactionId, Long accountId) {
         findTransactionByIdAndAccount(transactionId, accountId).ifPresent(transaction -> transactionRepository.deleteById(transactionId));
     }

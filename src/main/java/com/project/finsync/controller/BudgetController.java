@@ -36,12 +36,12 @@ public class BudgetController {
 
     @GetMapping("/category/{category}")
     public Iterable<Budget> findBudgetByCategoryForUser(@PathVariable Long userId, @PathVariable ExpenseCategory category) {
-        return budgetService.findBudgetByUserByCategory(userId, category);
+        return budgetService.findBudgetsByUserByCategory(userId, category);
     }
 
     @GetMapping("/total-amount")
     public Double findTotalAmountForBudgets(@PathVariable Long userId) {
-        return budgetService.findTotalAmountForBudgets(userId);
+        return budgetService.findTotalAmountOfBudgets(userId);
     }
 
     @PostMapping

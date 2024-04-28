@@ -5,6 +5,10 @@ import com.project.finsync.model.Budget;
 import com.project.finsync.repository.BudgetRepository;
 import com.project.finsync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Month;
@@ -13,16 +17,19 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = {"budgets"})
 public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final UserRepository userRepository;
 
-    public Optional<Budget> findBudgetByIdAndUser(Long budgetId, Long userId) {
-        return budgetRepository.findByIdAndUserId(budgetId, userId);
-    }
-
+    @Cacheable(key = "#userId")
     public List<Budget> findBudgetsByUser(Long userId) {
         return budgetRepository.findByUserId(userId);
+    }
+
+    @Cacheable(key = "#budgetId + #userId")
+    public Optional<Budget> findBudgetByIdAndUser(Long budgetId, Long userId) {
+        return budgetRepository.findByIdAndUserId(budgetId, userId);
     }
 
     public List<Budget> findBudgetsByUserByMonth(Long userId, Month month) {
@@ -32,14 +39,14 @@ public class BudgetService {
                 .toList();
     }
 
-    public List<Budget> findBudgetByUserByCategory(Long userId, ExpenseCategory expenseCategory) {
+    public List<Budget> findBudgetsByUserByCategory(Long userId, ExpenseCategory expenseCategory) {
         return findBudgetsByUser(userId)
                 .stream()
                 .filter(budget -> expenseCategory.equals(budget.getCategory()))
                 .toList();
     }
 
-    public Double findTotalAmountForBudgets(Long userId) {
+    public Double findTotalAmountOfBudgets(Long userId) {
         return findBudgetsByUser(userId)
                 .stream()
                 .mapToDouble(Budget::getAmount)
@@ -53,6 +60,7 @@ public class BudgetService {
         });
     }
 
+    @CachePut(key = "#budgetId + #userId")
     public Optional<Budget> updateBudget(Long budgetId, Long userId, Budget updateBudget) {
         return findBudgetByIdAndUser(budgetId, userId).flatMap(budget -> {
             if (updateBudget.getAmount() != null) {
@@ -62,6 +70,7 @@ public class BudgetService {
         });
     }
 
+    @CacheEvict(key = "#userId")
     public void deleteAllBudgetsByUserByCategory(Long userId, ExpenseCategory expenseCategory) {
         List<Long> ids = budgetRepository.findByUserId(userId)
                 .stream()
@@ -71,6 +80,7 @@ public class BudgetService {
         budgetRepository.deleteAllById(ids);
     }
 
+    @CacheEvict(key = "#budgetId + #userId")
     public void deleteBudget(Long budgetId, Long userId) {
         findBudgetByIdAndUser(budgetId, userId).ifPresent(budget -> budgetRepository.deleteById(budgetId));
     }
