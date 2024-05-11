@@ -1,9 +1,9 @@
 package com.project.finsync.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.finsync.TestUtils;
 import com.project.finsync.model.User;
 import com.project.finsync.service.UserService;
+import com.project.finsync.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

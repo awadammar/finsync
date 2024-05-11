@@ -15,8 +15,6 @@ import java.util.Currency;
 @NoArgsConstructor
 @Table(name = "accounts")
 public class Account {
-    public static final String ACCOUNT_DEFAULT_NAME = "Default Account";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,12 +33,6 @@ public class Account {
 
     @Pattern(regexp = "\\b[A-Z]{3}\\b", message = "Currency must be a valid 3 capital letters")
     private Currency currency;
-
-    public Account(User user) {
-        this.user = user;
-        this.accountNo = ACCOUNT_DEFAULT_NAME;
-        this.type = AccountType.PERSONAL;
-    }
 
     public Account(User user, String accountNo) {
         this.user = user;

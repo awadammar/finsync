@@ -35,26 +35,26 @@ public class Transaction {
     @Positive(message = "Budget amount must be a positive value")
     private Double amount;
 
-    @PastOrPresent(message = "Due date must be less than or equal today")
+    @PastOrPresent(message = "Transaction date must be less than or equal today")
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @EnumValidator(enumClazz = ExpenseCategory.class)
     private ExpenseCategory category;
 
-    private Point location;
-
     private String description;
+
+    private Point location;
 
     private Set<String> tags = new HashSet<>();
 
 
-    public Transaction(Account account, Double amount, LocalDate date, TransactionType type) {
+    public Transaction(Account account, Double amount, LocalDate date, TransactionType type, String description) {
         this.account = account;
         this.amount = amount;
         this.date = date;
         this.type = type;
-        this.description = "";
+        this.description = description;
     }
 
     public Transaction(Account account, Double amount, LocalDate date, TransactionType type, ExpenseCategory category) {

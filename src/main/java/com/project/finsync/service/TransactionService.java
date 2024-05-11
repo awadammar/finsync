@@ -3,7 +3,6 @@ package com.project.finsync.service;
 import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.enums.TransactionType;
 import com.project.finsync.model.Transaction;
-import com.project.finsync.repository.AccountRepository;
 import com.project.finsync.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
@@ -24,7 +23,7 @@ import java.util.Set;
 @CacheConfig(cacheNames = {"transactions"})
 public class TransactionService {
     private final TransactionRepository transactionRepository;
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
     @Cacheable(key = "#accountId")
     public List<Transaction> findTransactionsByAccount(Long accountId) {
@@ -72,7 +71,7 @@ public class TransactionService {
     }
 
     public Optional<Transaction> createTransaction(Long accountId, Transaction transaction) {
-        return accountRepository.findById(accountId).map(account -> {
+        return accountService.findAccountById(accountId).map(account -> {
             transaction.setAccount(account);
             return transactionRepository.save(transaction);
         });
@@ -112,7 +111,7 @@ public class TransactionService {
                 .stream()
                 .map(Transaction::getId)
                 .toList();
-        accountRepository.deleteAllById(ids);
+        transactionRepository.deleteAllById(ids);
     }
 
     @CacheEvict(key = "#transactionId + #accountId")

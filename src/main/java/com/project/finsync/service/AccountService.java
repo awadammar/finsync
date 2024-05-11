@@ -2,7 +2,6 @@ package com.project.finsync.service;
 
 import com.project.finsync.model.Account;
 import com.project.finsync.repository.AccountRepository;
-import com.project.finsync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,10 +17,14 @@ import java.util.Optional;
 @CacheConfig(cacheNames = {"accounts"})
 public class AccountService {
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
+
+    public Optional<Account> findAccountById(Long id) {
+        return accountRepository.findById(id);
+    }
 
     @Cacheable(key = "#userId")
-    public Iterable<Account> findAccountsByUser(Long userId) {
+    public List<Account> findAccountsByUser(Long userId) {
         return accountRepository.findByUserId(userId);
     }
 
@@ -31,7 +34,7 @@ public class AccountService {
     }
 
     public Optional<Account> createAccount(Long userId, Account account) {
-        return userRepository.findById(userId).map(user -> {
+        return userService.findUserById(userId).map(user -> {
             account.setUser(user);
             return accountRepository.save(account);
         });
@@ -55,11 +58,7 @@ public class AccountService {
 
     @CacheEvict(key = "#userId")
     public void deleteAllAccountsByUserId(Long userId) {
-        List<Long> ids = accountRepository.findByUserId(userId)
-                .stream()
-                .map(Account::getId)
-                .toList();
-        accountRepository.deleteAllById(ids);
+        accountRepository.deleteAllByUserId(userId);
     }
 
     @CacheEvict(key = "#id + #userId")

@@ -11,4 +11,6 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
 
     Optional<Account> findByIdAndUserId(Long id, Long userId);
 
+    void deleteAllByUserId(Long userId);
+
 }

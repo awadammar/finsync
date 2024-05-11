@@ -1,11 +1,11 @@
 package com.project.finsync.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.finsync.TestUtils;
 import com.project.finsync.enums.AccountType;
 import com.project.finsync.model.Account;
 import com.project.finsync.model.User;
 import com.project.finsync.service.AccountService;
+import com.project.finsync.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ class AccountControllerTests {
     void setUp() {
         user = TestUtils.createSimpleUser();
 
-        account = new Account(user);
+        account = new Account(user, "1234");
         account.setId(1L);
     }
 

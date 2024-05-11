@@ -5,17 +5,25 @@ import com.project.finsync.model.Account;
 import com.project.finsync.model.Sms;
 import com.project.finsync.model.Transaction;
 import com.project.finsync.model.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Currency;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@CacheConfig(cacheNames = {"sms"})
 public class SmsProcessorService {
+    private final AccountService accountService;
+    private final TransactionService transactionService;
     private static final String CURRENCIES = Currency.getAvailableCurrencies().stream()
             .map(Currency::getCurrencyCode)
             .collect(Collectors.joining("|"));
@@ -26,24 +34,36 @@ public class SmsProcessorService {
     private static final Pattern transferPattern = Pattern.compile("(?i)(transfer|transfered)");
     private static final Pattern declinedPattern = Pattern.compile("(?i)(declined)");
 
-    public void convertSmsForUser(List<Sms> smsList, User user) {
-        List<Transaction> transactions = filterDeclined(smsList).stream()
-                .map(sms -> convertSmsToTransaction(sms, user))
-                .toList();
+    @Cacheable(key = "#user.id")
+    public void convertSmsListForUser(List<Sms> smsList, User user) {
+        smsList.stream()
+                .filter(this::isTransactionApproved)
+                .forEach(sms -> convertSmsToTransaction(sms, user));
     }
 
-    private List<Sms> filterDeclined(List<Sms> smsList) {
-        return smsList.stream()
-                .filter(sms -> !declinedPattern.matcher(sms.getBody()).find())
-                .toList();
-    }
-
-    public Transaction convertSmsToTransaction(Sms sms, User user) {
+    public void convertSmsToTransaction(Sms sms, User user) {
         Double amount = getTransactionAmount(sms.getBody());
         String accountNo = getTransactionAccountNo(sms.getBody());
         TransactionType transactionType = getTransactionType(sms.getBody());
         LocalDate date = sms.getDate();
-        return new Transaction(new Account(user, accountNo), amount, date, transactionType);
+        String description = sms.getBody();
+        //TODO: Figure out to which ExpenceCatergory this transaction belong
+
+        // Try to find an account created already to associate this transaction to
+        // Or, try to create on if possible
+        Optional<Account> associatedAccount = accountService.findAccountsByUser(user.getId()).stream()
+                .filter(account -> account.getAccountNo().equals(accountNo))
+                .findFirst()
+                .or(() -> accountService.createAccount(user.getId(), new Account(user, accountNo)));
+
+        if (associatedAccount.isPresent()) {
+            Transaction transaction = new Transaction(associatedAccount.get(), amount, date, transactionType, description);
+            transactionService.createTransaction(associatedAccount.get().getId(), transaction);
+        }
+    }
+
+    private boolean isTransactionApproved(Sms sms) {
+        return !declinedPattern.matcher(sms.getBody()).find();
     }
 
     private Double getTransactionAmount(String smsBody) {

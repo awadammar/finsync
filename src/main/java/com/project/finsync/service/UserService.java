@@ -1,8 +1,8 @@
 package com.project.finsync.service;
 
-import com.project.finsync.model.Account;
 import com.project.finsync.model.User;
 import com.project.finsync.model.UserSettings;
+import com.project.finsync.repository.AccountRepository;
 import com.project.finsync.repository.UserRepository;
 import com.project.finsync.repository.UserSettingsRepository;
 import jakarta.transaction.Transactional;
@@ -13,6 +13,8 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,16 +22,22 @@ import java.util.Optional;
 @CacheConfig(cacheNames = {"users"})
 public class UserService {
     private final UserRepository userRepository;
-    private final AccountService accountService;
+    private final AccountRepository accountRepository;
     private final UserSettingsRepository userSettingsRepository;
 
-    public Iterable<User> findAllUsers() {
-        return userRepository.findAll();
+    public List<User> findAllUsers() {
+        List<User> allUsers = new ArrayList<>();
+        userRepository.findAll().forEach(allUsers::add);
+        return allUsers;
     }
 
     @Cacheable(key = "#id")
     public Optional<User> findUserById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Transactional
@@ -39,9 +47,6 @@ public class UserService {
 
         UserSettings userSettings = new UserSettings(user);
         userSettingsRepository.save(userSettings);
-
-        Account account = new Account(user);
-        accountService.createAccount(user.getId(), account);
 
         return savedUser;
     }
@@ -56,7 +61,7 @@ public class UserService {
     @CacheEvict(key = "#userId")
     public void deleteUser(Long id) {
         findUserById(id).ifPresent(user -> {
-            accountService.deleteAllAccountsByUserId(user.getId());
+            accountRepository.deleteAllByUserId(user.getId());
             userSettingsRepository.deleteByUserId(user.getId());
             userRepository.delete(user);
         });

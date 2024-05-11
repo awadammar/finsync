@@ -1,4 +1,4 @@
-package com.project.finsync;
+package com.project.finsync.utils;
 
 import com.project.finsync.model.User;
 

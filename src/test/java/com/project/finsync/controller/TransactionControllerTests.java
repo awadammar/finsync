@@ -1,13 +1,13 @@
 package com.project.finsync.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.finsync.TestUtils;
 import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.enums.TransactionType;
 import com.project.finsync.model.Account;
 import com.project.finsync.model.Transaction;
 import com.project.finsync.model.User;
 import com.project.finsync.service.TransactionService;
+import com.project.finsync.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ class TransactionControllerTests {
     void setUp() {
         User user = TestUtils.createSimpleUser();
 
-        account = new Account(user);
+        account = new Account(user, "1234");
         account.setId(1L);
 
         transaction = new Transaction(account, 1000.0, LocalDate.of(2024, 12, 12), TransactionType.OTHER, ExpenseCategory.GROCERIES);

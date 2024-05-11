@@ -3,7 +3,6 @@ package com.project.finsync.service;
 import com.project.finsync.enums.ExpenseCategory;
 import com.project.finsync.model.Budget;
 import com.project.finsync.repository.BudgetRepository;
-import com.project.finsync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,7 +19,7 @@ import java.util.Optional;
 @CacheConfig(cacheNames = {"budgets"})
 public class BudgetService {
     private final BudgetRepository budgetRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Cacheable(key = "#userId")
     public List<Budget> findBudgetsByUser(Long userId) {
@@ -54,7 +53,7 @@ public class BudgetService {
     }
 
     public Optional<Budget> createBudget(Long userId, Budget budget) {
-        return userRepository.findById(userId).map(user -> {
+        return userService.findUserById(userId).map(user -> {
             budget.setUser(user);
             return budgetRepository.save(budget);
         });

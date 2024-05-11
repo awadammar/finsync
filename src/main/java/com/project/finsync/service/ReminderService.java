@@ -3,7 +3,6 @@ package com.project.finsync.service;
 import com.project.finsync.enums.ReminderStatus;
 import com.project.finsync.model.Reminder;
 import com.project.finsync.repository.ReminderRepository;
-import com.project.finsync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,7 +19,7 @@ import java.util.Optional;
 @CacheConfig(cacheNames = {"reminders"})
 public class ReminderService {
     private final ReminderRepository reminderRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Cacheable(key = "#userId")
     public List<Reminder> findRemindersByUser(Long userId) {
@@ -47,7 +46,7 @@ public class ReminderService {
     }
 
     public Optional<Reminder> createReminder(Long userId, Reminder reminder) {
-        return userRepository.findById(userId).map(user -> {
+        return userService.findUserById(userId).map(user -> {
             reminder.setUser(user);
             return reminderRepository.save(reminder);
         });

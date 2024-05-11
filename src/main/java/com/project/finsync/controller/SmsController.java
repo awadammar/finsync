@@ -4,6 +4,7 @@ import com.project.finsync.model.Sms;
 import com.project.finsync.model.Transaction;
 import com.project.finsync.model.User;
 import com.project.finsync.service.SmsProcessorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +21,8 @@ public class SmsController {
     private final SmsProcessorService smsProcessorService;
 
     @PostMapping
-    public ResponseEntity<Transaction> processSmsForAccount(@RequestBody List<Sms> smsList, User user) {
-        smsProcessorService.convertSmsForUser(smsList, user);
+    public ResponseEntity<Transaction> processSmsForAccount(@Valid @RequestBody List<Sms> smsList, User user) {
+        smsProcessorService.convertSmsListForUser(smsList, user);
         return ResponseEntity.ok().build();
     }
 }
